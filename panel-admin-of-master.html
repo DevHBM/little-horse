@@ -31,12 +31,12 @@
                     <div class="race-track">
                         <div class="track-grass track-grass-top"></div>
                         
-                        <div class="track-lanes">
-                            <div class="track-header">
+                        <div class="track-lanes admin-layout">
+                            <div class="track-header admin-track-header">
                                 <div class="vendor-info">🏇 Jóquei</div>
                                 <div class="progress-info">Pista de Corrida</div>
                                 <div class="sales-info">Vendas</div>
-                                <div class="target-info">Meta</div>
+                                <div class="target-info">🎯 Meta</div>
                             </div>
                             
                             <div id="race-lanes">
@@ -50,7 +50,7 @@
                     <!-- Linha de chegada -->
                     <div class="finish-line">
                         <div class="finish-banner">CHEGADA</div>
-                        <div class="checkered-flag">🏁</div>
+                        <div class="checkered-flag">🏁🏁🏁🏁🏁🏁</div>
                     </div>
                 </div>
             </div>
@@ -59,6 +59,13 @@
             <div id="register-tab" class="tab-content">
                 <div class="register-section">
                     <h2>📝 Cadastro de Vendedores</h2>
+                    
+                    <div class="form-group">
+                        <label for="vendedor-select">Editar Vendedor Existente:</label>
+                        <select id="vendedor-select" onchange="selectVendedor()">
+                            <option value="">➕ Adicionar Novo Vendedor</option>
+                        </select>
+                    </div>
                     
                     <form id="vendedor-form" class="vendor-form">
                         <div class="form-grid">
@@ -88,8 +95,11 @@
                         </div>
                         
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">
-                                <span id="form-btn-text">➕ Adicionar Vendedor</span>
+                            <button type="button" id="salvar-vendedor" class="btn btn-primary" onclick="salvarVendedor()">
+                                💾 Salvar Vendedor
+                            </button>
+                            <button type="button" onclick="limparFormulario()" class="btn btn-secondary">
+                                🔄 Limpar Formulário
                             </button>
                             <button type="button" id="cancel-edit" class="btn btn-secondary" style="display: none;">
                                 ❌ Cancelar Edição
@@ -113,6 +123,9 @@
                             </a>
                             <button type="button" onclick="generateJsonForDownload()" class="btn btn-secondary">
                                 🔄 Gerar JSON para Download
+                            </button>
+                            <button type="button" onclick="resetToOriginalJson()" class="btn btn-secondary">
+                                ↩️ Restaurar dados do JSON original
                             </button>
                         </div>
                     </div>

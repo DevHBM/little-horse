@@ -18,13 +18,46 @@ const avatarColors = [
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
     loadVendedoresData();
-    // Recarregar dados a cada 30 segundos (caso o arquivo JSON seja atualizado)
-    setInterval(loadVendedoresData, 30000);
+    // Recarregar dados a cada 5 segundos para capturar mudanças do localStorage
+    setInterval(loadVendedoresData, 5000);
+    
+    // Escutar mudanças no localStorage de outras abas
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'vendedoresData') {
+            loadVendedoresData();
+        }
+    });
 });
+
+// Função para carregar dados do localStorage se existir
+function loadFromLocalStorage() {
+    try {
+        const storedData = localStorage.getItem('vendedoresData');
+        if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            if (parsedData.vendedores && Array.isArray(parsedData.vendedores)) {
+                vendedoresData = parsedData.vendedores;
+                console.log('Dados carregados do localStorage para visualização');
+                return true;
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar do localStorage:', error);
+    }
+    return false;
+}
 
 // Carregar dados do arquivo JSON
 async function loadVendedoresData() {
     try {
+        // Tentar carregar do localStorage primeiro (dados mais recentes do painel admin)
+        if (loadFromLocalStorage()) {
+            renderVendedores();
+            updateStats();
+            return;
+        }
+        
+        // Se não houver dados no localStorage, carregar do JSON
         const response = await fetch('./data/vendedores.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -86,7 +119,7 @@ function renderVendedores() {
             </div>
             <div class="progress-container">
                 <div class="progress-track racing" style="width: ${progressPercent}%">
-                    <span class="horse">🏃</span>
+                    <span class="horse">🚗</span>
                 </div>
             </div>
             <div class="sales-count">${vendedor.vendas}</div>

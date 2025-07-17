@@ -20,13 +20,51 @@ let raceStarted = false;
 let raceInterval = null;
 
 // Inicialização
-document.addEventListener('DOMContentLoaded', function() {
+function initializeApp() {
     setupTabs();
     loadVendedoresData();
-});
+}
+
+// Função para sincronizar dados com localStorage
+function syncWithLocalStorage() {
+    const dataToSync = {
+        vendedores: vendedoresData,
+        lastUpdate: new Date().toISOString()
+    };
+    localStorage.setItem('vendedoresData', JSON.stringify(dataToSync));
+    console.log('Dados sincronizados com localStorage');
+}
+
+// Função para carregar dados do localStorage se existir
+function loadFromLocalStorage() {
+    try {
+        const storedData = localStorage.getItem('vendedoresData');
+        if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            if (parsedData.vendedores && Array.isArray(parsedData.vendedores)) {
+                vendedoresData = parsedData.vendedores;
+                console.log('Dados carregados do localStorage');
+                return true;
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar do localStorage:', error);
+    }
+    return false;
+}
 
 async function loadVendedoresData() {
     try {
+        // Tentar carregar do localStorage primeiro
+        if (loadFromLocalStorage()) {
+            renderVendedores();
+            renderFormOptions();
+            renderVendedoresTable();
+            updateStats();
+            return;
+        }
+        
+        // Se não houver dados no localStorage, carregar do JSON
         const response = await fetch('./data/vendedores.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -34,8 +72,12 @@ async function loadVendedoresData() {
         const data = await response.json();
         vendedoresData = data.vendedores;
         
+        // Sincronizar com localStorage na primeira carga
+        syncWithLocalStorage();
+        
         renderVendedores();
         renderFormOptions();
+        renderVendedoresTable();
         updateStats();
     } catch (error) {
         console.error('Erro ao carregar dados do JSON:', error);
@@ -57,8 +99,12 @@ function loadDefaultData() {
         { id: 10, nome: "Camila Souza", vendas: 76, meta: 100, avatar: "CS" }
     ];
     
+    // Sincronizar dados padrão com localStorage
+    syncWithLocalStorage();
+    
     renderVendedores();
     renderFormOptions();
+    renderVendedoresTable();
     updateStats();
     generateJsonForDownload();
 }
@@ -108,7 +154,7 @@ function renderVendedores() {
             </div>
             <div class="progress-container">
                 <div class="progress-track ${raceStarted ? 'racing' : ''}" style="width: ${progressPercent}%">
-                    <span class="horse">🏃</span>
+                    <span class="horse">🚗</span>
                 </div>
             </div>
             <div class="sales-count">${vendedor.vendas}</div>
@@ -129,8 +175,12 @@ function startRace() {
             if (randomVendedor.vendas < randomVendedor.meta * 1.2) {
                 randomVendedor.vendas += Math.floor(Math.random() * 2) + 1;
                 renderVendedores();
+                renderVendedoresTable();
                 updateStats();
                 generateJsonForDownload();
+                
+                // Sincronizar com localStorage em tempo real
+                syncWithLocalStorage();
             }
         }
     }, 2000);
@@ -191,11 +241,102 @@ function selectVendedor() {
             document.getElementById('vendor-avatar').value = vendedor.avatar;
         }
     } else {
-        // Limpar formulário
-        document.getElementById('vendor-name').value = '';
-        document.getElementById('vendor-sales').value = '';
-        document.getElementById('vendor-target').value = '';
-        document.getElementById('vendor-avatar').value = '';
+        limparFormulario();
+    }
+}
+
+function limparFormulario() {
+    document.getElementById('vendor-name').value = '';
+    document.getElementById('vendor-sales').value = '';
+    document.getElementById('vendor-target').value = '';
+    document.getElementById('vendor-avatar').value = '';
+    document.getElementById('vendedor-select').value = '';
+}
+
+function renderVendedoresTable() {
+    const tableContainer = document.getElementById('vendors-table');
+    if (!tableContainer) return;
+    
+    if (vendedoresData.length === 0) {
+        tableContainer.innerHTML = '<p>Nenhum vendedor cadastrado.</p>';
+        return;
+    }
+    
+    let tableHTML = `
+        <table class="vendors-table">
+            <thead>
+                <tr>
+                    <th>Avatar</th>
+                    <th>Nome</th>
+                    <th>Vendas</th>
+                    <th>Meta</th>
+                    <th>Progress</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    vendedoresData.forEach((vendedor, index) => {
+        const progressPercent = Math.min((vendedor.vendas / vendedor.meta) * 100, 100);
+        tableHTML += `
+            <tr>
+                <td>
+                    <div class="table-avatar" style="background: ${avatarColors[index % avatarColors.length]}">
+                        ${vendedor.avatar}
+                    </div>
+                </td>
+                <td><strong>${vendedor.nome}</strong></td>
+                <td>${vendedor.vendas}</td>
+                <td>${vendedor.meta}</td>
+                <td>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                        <span class="progress-text">${progressPercent.toFixed(1)}%</span>
+                    </div>
+                </td>
+                <td>
+                    <button onclick="editarVendedor(${vendedor.id})" class="btn btn-small btn-secondary">
+                        ✏️ Editar
+                    </button>
+                    <button onclick="excluirVendedor(${vendedor.id})" class="btn btn-small btn-danger">
+                        🗑️ Excluir
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tableHTML += `
+            </tbody>
+        </table>
+    `;
+    
+    tableContainer.innerHTML = tableHTML;
+}
+
+function editarVendedor(id) {
+    const select = document.getElementById('vendedor-select');
+    select.value = id;
+    selectVendedor();
+    
+    // Scroll para o formulário
+    document.getElementById('vendedor-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+function excluirVendedor(id) {
+    if (confirm('Tem certeza que deseja excluir este vendedor?')) {
+        vendedoresData = vendedoresData.filter(v => v.id !== id);
+        renderVendedores();
+        renderFormOptions();
+        renderVendedoresTable();
+        updateStats();
+        generateJsonForDownload();
+        
+        // Sincronizar com localStorage
+        syncWithLocalStorage();
+        
+        alert('Vendedor excluído com sucesso!');
     }
 }
 
@@ -236,12 +377,15 @@ function salvarVendedor() {
     
     renderVendedores();
     renderFormOptions();
+    renderVendedoresTable();
     updateStats();
     generateJsonForDownload();
     
+    // Sincronizar com localStorage para o index.html
+    syncWithLocalStorage();
+    
     // Limpar formulário
-    document.getElementById('vendedor-select').value = '';
-    selectVendedor();
+    limparFormulario();
     
     alert('Vendedor salvo com sucesso!');
 }
@@ -292,6 +436,39 @@ function generateJsonForDownload() {
     }
 }
 
+// Função para resetar para os dados originais do JSON
+async function resetToOriginalJson() {
+    if (confirm('Tem certeza que deseja restaurar os dados originais do JSON? Todas as alterações locais serão perdidas.')) {
+        try {
+            // Limpar localStorage
+            localStorage.removeItem('vendedoresData');
+            
+            // Carregar dados diretamente do JSON
+            const response = await fetch('./data/vendedores.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            vendedoresData = data.vendedores;
+            
+            // Sincronizar com localStorage
+            syncWithLocalStorage();
+            
+            // Atualizar tudo
+            renderVendedores();
+            renderFormOptions();
+            renderVendedoresTable();
+            updateStats();
+            generateJsonForDownload();
+            
+            alert('Dados restaurados do JSON original com sucesso!');
+        } catch (error) {
+            console.error('Erro ao restaurar dados do JSON:', error);
+            alert('Erro ao carregar dados do JSON original.');
+        }
+    }
+}
+
 // Função para download do JSON
 function downloadJson() {
     generateJsonForDownload();
@@ -299,6 +476,9 @@ function downloadJson() {
 
 // Event listeners para controles
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar a aplicação
+    initializeApp();
+    
     // Controles da corrida
     const startBtn = document.getElementById('start-race');
     const pauseBtn = document.getElementById('pause-race');

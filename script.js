@@ -304,7 +304,7 @@ function renderVendedores() {
             </div>
             <div class="progress-container">
                 <div class="progress-track racing" style="width: ${progressPercent}%">
-                    <span class="horse">🏃</span>
+                    <span class="horse">🚗</span>
                 </div>
             </div>
             <div class="sales-count">${vendedor.vendas}</div>

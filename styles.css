@@ -19,6 +19,9 @@ body {
     padding: 20px;
     position: relative;
     z-index: 2;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 header {
@@ -208,6 +211,11 @@ header p {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
 }
 
+/* Track header com 4 colunas para o painel administrativo */
+.admin-track-header {
+    grid-template-columns: 200px 1fr 100px 100px !important;
+}
+
 .race-lane {
     display: grid;
     grid-template-columns: 200px 1fr 100px;
@@ -219,6 +227,63 @@ header p {
     position: relative;
 }
 
+/* Estilização específica para a coluna Meta */
+.target-info {
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    animation: target-pulse 2s ease-in-out infinite;
+}
+
+@keyframes target-pulse {
+    0%, 100% { 
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.7); 
+    }
+    50% { 
+        text-shadow: 1px 1px 8px rgba(255,255,255,0.8), 1px 1px 2px rgba(0,0,0,0.7); 
+    }
+}
+
+.meta-count {
+    text-align: center;
+    font-weight: 600;
+    color: #1e40af;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 2px solid #1e40af;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    min-width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.race-lane:hover .meta-count {
+    background: #1e40af;
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(30, 64, 175, 0.3);
+}
+
+/* Sincronização visual com sales-count */
+.sales-count {
+    transition: all 0.3s ease;
+}
+
+.race-lane:hover .sales-count {
+    transform: scale(1.05);
+}
+
+/* Race lane com 4 colunas para o painel administrativo */
+.admin-layout .race-lane {
+    grid-template-columns: 200px 1fr 100px 100px;
+}
+
 .race-lane::before {
     content: '';
     position: absolute;
@@ -226,13 +291,7 @@ header p {
     right: 115px;
     top: 50%;
     height: 2px;
-    background: repeating-linear-gradient(
-        90deg,
-        white 0px,
-        white 10px,
-        transparent 10px,
-        transparent 20px
-    );
+   
     transform: translateY(-50%);
     opacity: 0.6;
 }
@@ -371,6 +430,9 @@ header p {
     padding: 30px;
     margin-bottom: 30px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .register-section h2 {
@@ -386,6 +448,9 @@ header p {
     border-radius: 15px;
     margin-bottom: 30px;
     border: 2px solid #e9ecef;
+    overflow: hidden;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .form-grid {
@@ -425,6 +490,9 @@ header p {
     display: flex;
     gap: 15px;
     justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 20px;
 }
 
 .vendors-list {
@@ -581,6 +649,107 @@ header p {
     box-shadow: 0 0 25px rgba(205, 127, 50, 0.7);
 }
 
+/* Tabela de vendedores */
+.vendors-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.vendors-table th {
+    background: linear-gradient(135deg, #1e40af 0%, #dc2626 100%);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.vendors-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.vendors-table tr:hover {
+    background-color: #f9fafb;
+}
+
+.table-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    margin: 0 auto;
+}
+
+.progress-bar {
+    position: relative;
+    background: #e5e7eb;
+    border-radius: 20px;
+    height: 20px;
+    min-width: 100px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #dc2626 0%, #1e40af 100%);
+    border-radius: 20px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 11px;
+    font-weight: bold;
+    color: #374151;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+    margin: 0 2px;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+}
+
+/* Select de vendedores */
+select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+    margin-bottom: 20px;
+}
+
+select:focus {
+    outline: none;
+    border-color: #1e40af;
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
 /* Gerenciamento de dados */
 .data-management {
     margin-top: 30px;
@@ -629,8 +798,21 @@ header p {
     
     .track-header,
     .race-lane {
-        grid-template-columns: 120px 1fr 70px 70px;
+        grid-template-columns: 120px 1fr 70px;
         gap: 8px;
+    }
+    
+    /* Layout mobile para painel administrativo com 4 colunas */
+    .admin-track-header,
+    .admin-layout .race-lane {
+        grid-template-columns: 100px 1fr 50px 50px;
+        gap: 5px;
+    }
+    
+    .meta-count {
+        padding: 6px 8px;
+        font-size: 12px;
+        min-width: 40px;
     }
     
     .vendor-name {
@@ -653,6 +835,16 @@ header p {
     
     .form-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        max-width: 300px;
     }
     
     .vendors-table {
