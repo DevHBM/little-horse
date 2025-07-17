@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrida dos Vendedores - Little Horse</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+            <header>
+                <h1>🏆 Corrida dos Vendedores 🏆</h1>
+                <p>Acompanhe o desempenho da sua equipe em tempo real!</p>
+            </header>
+
+            <!-- Sistema de Abas -->
+            <div class="tabs">
+                <button class="tab-button active" data-tab="race">🏁 Corrida</button>
+            </div>
+
+            <!-- Aba da Corrida -->
+            <div id="race-tab" class="tab-content active">
+                <div class="race-field">
+                    <!-- Linha de largada -->
+                    <div class="start-line">
+                        <div class="start-banner">LARGADA</div>
+                    </div>
+                    
+                    <!-- Pista de corrida -->
+                    <div class="race-track">
+                        <div class="track-grass track-grass-top"></div>
+                        
+                        <div class="track-lanes">
+                            <div class="track-header">
+                                <div class="vendor-info">🏇 Jóquei</div>
+                                <div class="progress-info">Pista de Corrida</div>
+                                <div class="sales-info">Vendas</div>
+                            </div>
+                            
+                            <div id="race-lanes">
+                                <!-- Os vendedores serão inseridos aqui via JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="track-grass track-grass-bottom"></div>
+                    </div>
+                    
+                    <!-- Linha de chegada -->
+                    <div class="finish-line">
+                        <div class="finish-banner">CHEGADA</div>
+                        <div class="checkered-flag">🏁</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>🥇 Líder</h3>
+                    <p id="leader">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📈 Total de Vendas</h3>
+                    <p id="totalSales">-</p>
+                </div>
+            </div>
+        </div>
+
+    <script src="script-viewer.js"></script>
+</body>
+</html>

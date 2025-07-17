@@ -1,0 +1,74 @@
+{
+  "vendedores": [
+    {
+      "id": 1,
+      "nome": "Carlos Silva",
+      "vendas": 85,
+      "meta": 100,
+      "avatar": "CS"
+    },
+    {
+      "id": 2,
+      "nome": "Ana Santos",
+      "vendas": 92,
+      "meta": 100,
+      "avatar": "AS"
+    },
+    {
+      "id": 3,
+      "nome": "João Pereira",
+      "vendas": 78,
+      "meta": 100,
+      "avatar": "JP"
+    },
+    {
+      "id": 4,
+      "nome": "Maria Oliveira",
+      "vendas": 95,
+      "meta": 100,
+      "avatar": "MO"
+    },
+    {
+      "id": 5,
+      "nome": "Pedro Costa",
+      "vendas": 67,
+      "meta": 100,
+      "avatar": "PC"
+    },
+    {
+      "id": 6,
+      "nome": "Lucia Ferreira",
+      "vendas": 88,
+      "meta": 100,
+      "avatar": "LF"
+    },
+    {
+      "id": 7,
+      "nome": "Roberto Lima",
+      "vendas": 73,
+      "meta": 100,
+      "avatar": "RL"
+    },
+    {
+      "id": 8,
+      "nome": "Fernanda Rocha",
+      "vendas": 91,
+      "meta": 100,
+      "avatar": "FR"
+    },
+    {
+      "id": 9,
+      "nome": "Daniel Martins",
+      "vendas": 82,
+      "meta": 100,
+      "avatar": "DM"
+    },
+    {
+      "id": 10,
+      "nome": "Camila Souza",
+      "vendas": 76,
+      "meta": 100,
+      "avatar": "CS"
+    }
+  ]
+}

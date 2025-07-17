@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrida dos Vendedores - Little Horse</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+            <header>
+                <h1>🏆 Corrida dos Vendedores 🏆</h1>
+                <p>Acompanhe o desempenho da sua equipe em tempo real!</p>
+            </header>
+
+            <!-- Sistema de Abas -->
+            <div class="tabs">
+                <button class="tab-button active" data-tab="race">🏁 Corrida</button>
+                <button class="tab-button" data-tab="register">📝 Cadastro</button>
+            </div>
+
+            <!-- Aba da Corrida -->
+            <div id="race-tab" class="tab-content active">
+                <div class="race-field">
+                    <!-- Linha de largada -->
+                    <div class="start-line">
+                        <div class="start-banner">LARGADA</div>
+                    </div>
+                    
+                    <!-- Pista de corrida -->
+                    <div class="race-track">
+                        <div class="track-grass track-grass-top"></div>
+                        
+                        <div class="track-lanes">
+                            <div class="track-header">
+                                <div class="vendor-info">🏇 Jóquei</div>
+                                <div class="progress-info">Pista de Corrida</div>
+                                <div class="sales-info">Vendas</div>
+                                <div class="target-info">Meta</div>
+                            </div>
+                            
+                            <div id="race-lanes">
+                                <!-- Os vendedores serão inseridos aqui via JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="track-grass track-grass-bottom"></div>
+                    </div>
+                    
+                    <!-- Linha de chegada -->
+                    <div class="finish-line">
+                        <div class="finish-banner">CHEGADA</div>
+                        <div class="checkered-flag">🏁</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aba de Cadastro -->
+            <div id="register-tab" class="tab-content">
+                <div class="register-section">
+                    <h2>📝 Cadastro de Vendedores</h2>
+                    
+                    <form id="vendedor-form" class="vendor-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="vendor-name">Nome do Vendedor:</label>
+                                <input type="text" id="vendor-name" name="name" required 
+                                       placeholder="Ex: João Silva">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="vendor-avatar">Avatar (2 letras):</label>
+                                <input type="text" id="vendor-avatar" name="avatar" 
+                                       maxlength="2" required placeholder="Ex: JS">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="vendor-sales">Vendas Atuais:</label>
+                                <input type="number" id="vendor-sales" name="sales" 
+                                       min="0" required placeholder="Ex: 85">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="vendor-target">Meta de Vendas:</label>
+                                <input type="number" id="vendor-target" name="target" 
+                                       min="1" required placeholder="Ex: 100">
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <span id="form-btn-text">➕ Adicionar Vendedor</span>
+                            </button>
+                            <button type="button" id="cancel-edit" class="btn btn-secondary" style="display: none;">
+                                ❌ Cancelar Edição
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="vendors-list">
+                        <h3>👥 Lista de Vendedores</h3>
+                        <div id="vendors-table">
+                            <!-- Tabela será preenchida via JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="data-management">
+                        <h3>📁 Gerenciamento de Dados</h3>
+                        <p>💡 <strong>Para GitHub Pages:</strong> Após fazer alterações, baixe o arquivo JSON atualizado e substitua o arquivo <code>data/vendedores.json</code> no seu repositório.</p>
+                        <div class="form-actions">
+                            <a id="download-json" href="#" class="btn btn-primary" style="display: none;">
+                                📥 Baixar vendedores.json
+                            </a>
+                            <button type="button" onclick="generateJsonForDownload()" class="btn btn-secondary">
+                                🔄 Gerar JSON para Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>🥇 Líder</h3>
+                    <p id="leader">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📈 Total de Vendas</h3>
+                    <p id="totalSales">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3>🎯 Meta Geral</h3>
+                    <p id="totalTarget">-</p>
+                </div>
+            </div>
+        </div>
+
+    <script src="script-admin.js"></script>
+</body>
+</html>
