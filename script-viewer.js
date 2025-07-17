@@ -156,8 +156,23 @@ function renderVendedores() {
 
         // Calcular progresso baseado na meta individual do vendedor
         const progressPercent = Math.min((vendedor.vendas / vendedor.meta) * 100, 100);
+        
+        // Função para gerar ícone de classificação
+        function getClassificationIcon(position) {
+            switch(position) {
+                case 1: return '🥇';
+                case 2: return '🥈';
+                case 3: return '🥉';
+                default: return `${position}º`;
+            }
+        }
+        
+        const classificationIcon = getClassificationIcon(index + 1);
 
         lane.innerHTML = `
+            <div class="classification-display">
+                <span class="classification-icon ${index < 3 ? 'podium' : ''}">${classificationIcon}</span>
+            </div>
             <div class="vendor-name">
                 <div class="vendor-avatar" style="background: ${avatarColors[index % avatarColors.length]}">
                     ${vendedor.avatar}

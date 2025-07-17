@@ -10,14 +10,25 @@
     <div class="container">
             <header>
                 <h1>🏆 Corrida dos Vendedores 🏆</h1>
-                <p>Acompanhe o desempenho da sua equipe</p>
+                <p>Acompanhe o desempenho da sua equipe em tempo real!</p>
             </header>
 
-            <!-- Sistema de Abas -->
-            <div class="tabs">
-                <button class="tab-button active" data-tab="race">🏁 Corrida</button>
-                <button class="tab-button" data-tab="register">📝 Cadastro</button>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>🥇 Líder</h3>
+                    <p id="leader">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3>📈 Total de Vendas</h3>
+                    <p id="totalSales">-</p>
+                </div>
+                <div class="stat-card">
+                    <h3>🎯 Meta Geral</h3>
+                    <p id="totalTarget">-</p>
+                </div>
             </div>
+            <br>
 
             <!-- Aba da Corrida -->
             <div id="race-tab" class="tab-content active">
@@ -33,6 +44,7 @@
                         
                         <div class="track-lanes admin-layout">
                             <div class="track-header admin-track-header">
+                                <div class="classification-info">🏆 Posição</div>
                                 <div class="vendor-info">Vendedores</div>
                                 <div class="progress-info">Classificação</div>
                                 <div class="sales-info">Vendas</div>
@@ -50,70 +62,26 @@
                     <!-- Linha de chegada -->
                     <div class="finish-line">
                         <div class="finish-banner">CHEGADA</div>
-                        <div class="checkered-flag">🏁🏁🏁🏁🏁🏁</div>
+                        <div class="checkered-flag">🏁</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Aba de Cadastro -->
-            <div id="register-tab" class="tab-content">
-                <div class="register-section">
-                    <h2> Dados dos Vendedores</h2>
-                   
-                    
-                    <div class="vendors-list">
-                        <h3>👥 Lista de Vendedores da Planilha</h3>
-                        <div id="vendors-table">
-                            <!-- Tabela será preenchida via JavaScript -->
-                        </div>
-                    </div>
-                    
-                    <div class="sheets-integration">
-                        <h3>📊 Integração com Google Sheets</h3>
-                        <p>🔗 <strong>Planilha configurada:</strong> <code>109tr9R9fN0wLBjLYomoXdpTKzUN1C6Fjzafj5GTpRHY</code></p>
-                        <div class="form-actions">
-                            <button type="button" onclick="testSheetsConnection()" class="btn btn-primary">
-                                🔗 Testar Conexão com Planilha
-                            </button>
-                            <button type="button" onclick="loadFromSheetsManual()" class="btn btn-secondary">
-                                📊 Carregar Dados da Planilha
-                            </button>
-                        </div>
-                        <div id="sheets-status" style="margin-top: 10px; padding: 10px; border-radius: 5px; display: none;">
-                            <!-- Status da conexão aparecerá aqui -->
-                        </div>
-                    </div>
-                    
-                    <!--<div class="data-management">
-                        <h3>📁 Gerenciamento de Dados</h3>
-                        <p>💡 <strong>Para GitHub Pages:</strong> Após fazer alterações, baixe o arquivo JSON atualizado e substitua o arquivo <code>data/vendedores.json</code> no seu repositório.</p>
-                        <div class="form-actions">
-                            <a id="download-json" href="#" class="btn btn-primary" style="display: none;">
-                                📥 Baixar vendedores.json
-                            </a>
-                            <button type="button" onclick="generateJsonForDownload()" class="btn btn-secondary">
-                                🔄 Gerar JSON para Download
-                            </button>
-                            <button type="button" onclick="resetToOriginalJson()" class="btn btn-secondary">
-                                ↩️ Restaurar dados do JSON original
-                            </button>
-                        </div>
-                    </div>-->
+            
+            
+            <!-- Controles da Planilha -->
+            <div class="sheets-controls">
+                <h3>📊 Controles da Planilha</h3>
+                <div class="form-actions">
+                    <button type="button" onclick="loadFromSheetsManual()" class="btn btn-primary">
+                        🔄 Atualizar da Planilha
+                    </button>
+                    <button type="button" onclick="testSheetsConnection()" class="btn btn-secondary">
+                        🔗 Testar Conexão
+                    </button>
                 </div>
-            </div>
-
-            <div class="stats">
-                <div class="stat-card">
-                    <h3>🥇 Líder</h3>
-                    <p id="leader">-</p>
-                </div>
-                <div class="stat-card">
-                    <h3>📈 Total de Vendas</h3>
-                    <p id="totalSales">-</p>
-                </div>
-                <div class="stat-card">
-                    <h3>🎯 Meta Geral</h3>
-                    <p id="totalTarget">-</p>
+                <div id="sheets-status" style="margin-top: 10px; padding: 10px; border-radius: 5px; display: none;">
+                    <!-- Status da conexão aparecerá aqui -->
                 </div>
             </div>
         </div>

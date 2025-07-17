@@ -201,7 +201,7 @@ header p {
 
 .track-header {
     display: grid;
-    grid-template-columns: 200px 1fr 100px;
+    grid-template-columns: 100px 200px 1fr 100px;
     gap: 15px;
     padding: 15px 0;
     border-bottom: 3px solid rgba(255,255,255,0.3);
@@ -211,14 +211,14 @@ header p {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
 }
 
-/* Track header com 4 colunas para o painel administrativo */
+/* Track header com 5 colunas para o painel administrativo */
 .admin-track-header {
-    grid-template-columns: 200px 1fr 100px 100px !important;
+    grid-template-columns: 100px 200px 1fr 100px 100px !important;
 }
 
 .race-lane {
     display: grid;
-    grid-template-columns: 200px 1fr 100px;
+    grid-template-columns: 100px 200px 1fr 100px;
     gap: 15px;
     align-items: center;
     padding: 15px 0;
@@ -279,15 +279,15 @@ header p {
     transform: scale(1.05);
 }
 
-/* Race lane com 4 colunas para o painel administrativo */
+/* Race lane com 5 colunas para o painel administrativo */
 .admin-layout .race-lane {
-    grid-template-columns: 200px 1fr 100px 100px;
+    grid-template-columns: 100px 200px 1fr 100px 100px;
 }
 
 .race-lane::before {
     content: '';
     position: absolute;
-    left: 200px;
+    left: 315px; /* 100px (classificação) + 200px (vendedor) + 15px (gap) */
     right: 115px;
     top: 50%;
     height: 2px;
@@ -323,6 +323,60 @@ header p {
     font-size: 16px;
     border: 3px solid white;
     box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+/* Estilos para classificação */
+.classification-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+}
+
+.classification-icon {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: linear-gradient(45deg, #6b7280, #4b5563);
+    border: 2px solid rgba(255,255,255,0.3);
+    min-width: 45px;
+    text-align: center;
+}
+
+.classification-icon.podium {
+    animation: podium-glow 2s infinite alternate;
+    background: linear-gradient(45deg, #fbbf24, #f59e0b);
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+}
+
+@keyframes podium-glow {
+    0% { 
+        box-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+        transform: scale(1);
+    }
+    100% { 
+        box-shadow: 0 0 25px rgba(251, 191, 36, 0.9);
+        transform: scale(1.05);
+    }
+}
+
+/* Estilos específicos para cada posição */
+.race-lane.position-1 .classification-icon {
+    background: linear-gradient(45deg, #ffd700, #ffed4a);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+}
+
+.race-lane.position-2 .classification-icon {
+    background: linear-gradient(45deg, #c0c0c0, #e5e7eb);
+    box-shadow: 0 0 15px rgba(192, 192, 192, 0.6);
+}
+
+.race-lane.position-3 .classification-icon {
+    background: linear-gradient(45deg, #cd7f32, #d97706);
+    box-shadow: 0 0 15px rgba(205, 127, 50, 0.6);
 }
 
 .progress-container {
@@ -633,6 +687,37 @@ header p {
     color: #333;
 }
 
+/* Controles da planilha */
+.sheets-controls {
+    margin-top: 30px;
+    padding: 25px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+}
+
+.sheets-controls h3 {
+    color: #1d4ed8;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.4em;
+}
+
+.sheets-controls .form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#sheets-status {
+    text-align: center;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
 /* Posições específicas para diferentes colocações */
 .race-lane.position-1 .progress-track {
     background: linear-gradient(90deg, #FFD700, #FFA500);
@@ -798,14 +883,14 @@ select:focus {
     
     .track-header,
     .race-lane {
-        grid-template-columns: 120px 1fr 70px;
+        grid-template-columns: 70px 120px 1fr 70px;
         gap: 8px;
     }
     
-    /* Layout mobile para painel administrativo com 4 colunas */
+    /* Layout mobile para painel administrativo com 5 colunas */
     .admin-track-header,
     .admin-layout .race-lane {
-        grid-template-columns: 100px 1fr 50px 50px;
+        grid-template-columns: 60px 100px 1fr 50px 50px;
         gap: 5px;
     }
     

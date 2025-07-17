@@ -53,17 +53,49 @@ function loadFromLocalStorage() {
     return false;
 }
 
+// Configuração da planilha (mesma configuração do viewer)
+const PLANILHA_CONFIG = {
+    // ID da sua planilha do Google Sheets
+    SHEET_ID: '109tr9R9fN0wLBjLYomoXdpTKzUN1C6Fjzafj5GTpRHY',
+    
+    // Se você quiser usar a API (opcional, mais robusto)
+    API_KEY: '', // CONFIGURE AQUI SE QUISER USAR API
+    
+    // Intervalo de atualização automática (em minutos)
+    AUTO_REFRESH_MINUTES: 2
+};
+
+// Função principal de carregamento de dados (atualizada para incluir planilha)
 async function loadVendedoresData() {
-    try {
-        // Tentar carregar do localStorage primeiro
-        if (loadFromLocalStorage()) {
-            renderVendedores();
-            renderVendedoresTable();
-            updateStats();
-            return;
+    // Prioridade 1: Tentar carregar da planilha
+    if (PLANILHA_CONFIG.SHEET_ID && sheetsIntegration) {
+        console.log('📊 [ADMIN] Tentando carregar dados da planilha...');
+        try {
+            const sheetsData = await loadFromSheets();
+            if (sheetsData && sheetsData.length > 0) {
+                vendedoresData = sheetsData;
+                renderVendedores();
+                renderVendedoresTable();
+                updateStats();
+                console.log('✅ [ADMIN] Dados carregados da planilha Google Sheets');
+                return;
+            }
+        } catch (error) {
+            console.warn('⚠️ [ADMIN] Erro ao carregar da planilha, tentando localStorage:', error);
         }
-        
-        // Se não houver dados no localStorage, carregar do JSON
+    }
+    
+    // Prioridade 2: Tentar carregar do localStorage
+    if (loadFromLocalStorage()) {
+        renderVendedores();
+        renderVendedoresTable();
+        updateStats();
+        console.log('💾 [ADMIN] Dados carregados do localStorage');
+        return;
+    }
+    
+    // Prioridade 3: Carregar do JSON
+    try {
         const response = await fetch('./data/vendedores.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -77,8 +109,9 @@ async function loadVendedoresData() {
         renderVendedores();
         renderVendedoresTable();
         updateStats();
+        console.log('📄 [ADMIN] Dados carregados do arquivo JSON');
     } catch (error) {
-        console.error('Erro ao carregar dados do JSON:', error);
+        console.error('❌ [ADMIN] Erro ao carregar dados do JSON:', error);
         loadDefaultData();
     }
 }
@@ -141,8 +174,23 @@ function renderVendedores() {
         lane.id = `lane-${vendedor.id}`;
 
         const progressPercent = Math.min((vendedor.vendas / vendedor.meta) * 100, 100);
+        
+        // Função para gerar ícone de classificação
+        function getClassificationIcon(position) {
+            switch(position) {
+                case 1: return '🥇';
+                case 2: return '🥈';
+                case 3: return '🥉';
+                default: return `${position}º`;
+            }
+        }
+        
+        const classificationIcon = getClassificationIcon(index + 1);
 
         lane.innerHTML = `
+            <div class="classification-display">
+                <span class="classification-icon ${index < 3 ? 'podium' : ''}">${classificationIcon}</span>
+            </div>
             <div class="vendor-name">
                 <div class="vendor-avatar" style="background: ${avatarColors[index % avatarColors.length]}">
                     ${vendedor.avatar}
@@ -330,7 +378,6 @@ async function resetToOriginalJson() {
             
             // Atualizar tudo
             renderVendedores();
-            renderFormOptions();
             renderVendedoresTable();
             updateStats();
             generateJsonForDownload();
@@ -349,9 +396,21 @@ function downloadJson() {
 }
 
 // Event listeners para controles
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     // Inicializar integração com Google Sheets
-    initSheetsIntegration();
+    if (PLANILHA_CONFIG.SHEET_ID) {
+        initSheetsIntegration(PLANILHA_CONFIG.SHEET_ID, PLANILHA_CONFIG.API_KEY);
+        console.log('🔗 [ADMIN] Integração com Google Sheets ativada');
+        
+        // Configurar auto-atualização
+        if (PLANILHA_CONFIG.AUTO_REFRESH_MINUTES > 0) {
+            const intervalMs = PLANILHA_CONFIG.AUTO_REFRESH_MINUTES * 60 * 1000;
+            setInterval(async () => {
+                console.log('🔄 [ADMIN] Verificando atualizações na planilha...');
+                await loadVendedoresData();
+            }, intervalMs);
+        }
+    }
     
     // Inicializar a aplicação
     initializeApp();
@@ -366,6 +425,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if (pauseBtn) pauseBtn.addEventListener('click', pauseRace);
     if (resetBtn) resetBtn.addEventListener('click', resetRace);
     if (updateBtn) updateBtn.addEventListener('click', loadVendedoresData);
+    
+    // Verificação periódica para sincronização entre abas
+    setInterval(loadVendedoresData, 30000); // A cada 30 segundos
+    
+    // Escutar mudanças no localStorage de outras abas
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'vendedoresData') {
+            console.log('🔄 [ADMIN] Mudança detectada no localStorage de outra aba');
+            loadVendedoresData();
+        }
+    });
 });
 
 // Funções para integração com Google Sheets
