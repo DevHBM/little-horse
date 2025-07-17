@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Integração - Google Sheets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        .btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover { background: #059669; }
+        .btn-secondary { background: #6b7280; }
+        .btn-secondary:hover { background: #4b5563; }
+        #output {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: #10b981; }
+        .error { background: #ef4444; }
+        .warning { background: #f59e0b; }
+        .info { background: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste de Integração - Google Sheets</h1>
+        <p><strong>Planilha ID:</strong> <code>109tr9R9fN0wLBjLYomoXdpTKzUN1C6Fjzafj5GTpRHY</code></p>
+        
+        <div class="test-section">
+            <h3>🔗 Testes de Conexão</h3>
+            <button class="btn" onclick="testarConexao()">🔗 Testar Conexão</button>
+            <button class="btn" onclick="carregarDados()">📊 Carregar Dados</button>
+            <button class="btn btn-secondary" onclick="limparOutput()">🗑️ Limpar Console</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Dados Carregados</h3>
+            <div id="dados-info">
+                <p>Nenhum dado carregado ainda.</p>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📝 Console de Logs</h3>
+            <div id="output">Aguardando testes...</div>
+        </div>
+    </div>
+
+    <script src="script-sheets.js"></script>
+    <script>
+        let outputDiv = document.getElementById('output');
+        let dadosDiv = document.getElementById('dados-info');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = {
+                'info': 'ℹ️',
+                'success': '✅',
+                'error': '❌',
+                'warning': '⚠️'
+            }[type] || 'ℹ️';
+            
+            outputDiv.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+            
+            console.log(message);
+        }
+        
+        function limparOutput() {
+            outputDiv.textContent = 'Console limpo.\n';
+        }
+        
+        function atualizarDadosInfo(vendedores) {
+            if (!vendedores || vendedores.length === 0) {
+                dadosDiv.innerHTML = '<p>Nenhum dado carregado.</p>';
+                return;
+            }
+            
+            let html = `<p><strong>${vendedores.length} vendedores encontrados:</strong></p><ul>`;
+            vendedores.forEach(v => {
+                html += `<li>${v.nome} (${v.avatar}): ${v.vendas}/${v.meta} vendas</li>`;
+            });
+            html += '</ul>';
+            dadosDiv.innerHTML = html;
+        }
+        
+        async function testarConexao() {
+            log('Iniciando teste de conexão...', 'info');
+            
+            try {
+                // Inicializar se não foi feito ainda
+                if (!window.sheetsIntegration) {
+                    log('Inicializando integração com Google Sheets...', 'info');
+                    initSheetsIntegration();
+                }
+                
+                log('Testando conexão com a planilha...', 'info');
+                const sucesso = await sheetsIntegration.testConnection();
+                
+                if (sucesso) {
+                    log('Conexão bem-sucedida! ✅', 'success');
+                } else {
+                    log('Falha na conexão. Verifique se a planilha está pública.', 'error');
+                }
+            } catch (error) {
+                log(`Erro no teste de conexão: ${error.message}`, 'error');
+            }
+        }
+        
+        async function carregarDados() {
+            log('Carregando dados da planilha...', 'info');
+            
+            try {
+                // Inicializar se não foi feito ainda
+                if (!window.sheetsIntegration) {
+                    log('Inicializando integração...', 'info');
+                    initSheetsIntegration();
+                }
+                
+                const vendedores = await loadFromSheets();
+                
+                if (vendedores && vendedores.length > 0) {
+                    log(`Dados carregados com sucesso! ${vendedores.length} vendedores encontrados.`, 'success');
+                    log('Detalhes dos vendedores:', 'info');
+                    vendedores.forEach((v, i) => {
+                        log(`  ${i + 1}. ${v.nome} (${v.avatar}): ${v.vendas}/${v.meta}`, 'info');
+                    });
+                    
+                    atualizarDadosInfo(vendedores);
+                } else {
+                    log('Nenhum vendedor encontrado na planilha.', 'warning');
+                    atualizarDadosInfo([]);
+                }
+            } catch (error) {
+                log(`Erro ao carregar dados: ${error.message}`, 'error');
+                atualizarDadosInfo([]);
+            }
+        }
+        
+        // Inicializar automaticamente ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Página carregada. Iniciando testes...', 'info');
+            log('ID da planilha: 109tr9R9fN0wLBjLYomoXdpTKzUN1C6Fjzafj5GTpRHY', 'info');
+            
+            // Inicializar integração
+            if (initSheetsIntegration()) {
+                log('Integração inicializada com sucesso!', 'success');
+            } else {
+                log('Erro ao inicializar integração.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -58,7 +58,6 @@ async function loadVendedoresData() {
         // Tentar carregar do localStorage primeiro
         if (loadFromLocalStorage()) {
             renderVendedores();
-            renderFormOptions();
             renderVendedoresTable();
             updateStats();
             return;
@@ -76,7 +75,6 @@ async function loadVendedoresData() {
         syncWithLocalStorage();
         
         renderVendedores();
-        renderFormOptions();
         renderVendedoresTable();
         updateStats();
     } catch (error) {
@@ -103,7 +101,6 @@ function loadDefaultData() {
     syncWithLocalStorage();
     
     renderVendedores();
-    renderFormOptions();
     renderVendedoresTable();
     updateStats();
     generateJsonForDownload();
@@ -214,45 +211,6 @@ function updateControlButtons() {
     }
 }
 
-// Cadastro de vendedores
-function renderFormOptions() {
-    const vendedorSelect = document.getElementById('vendedor-select');
-    if (!vendedorSelect) return;
-    
-    vendedorSelect.innerHTML = '<option value="">Selecione um vendedor para editar</option>';
-    vendedoresData.forEach(vendedor => {
-        const option = document.createElement('option');
-        option.value = vendedor.id;
-        option.textContent = vendedor.nome;
-        vendedorSelect.appendChild(option);
-    });
-}
-
-function selectVendedor() {
-    const select = document.getElementById('vendedor-select');
-    const vendedorId = parseInt(select.value);
-    
-    if (vendedorId) {
-        const vendedor = vendedoresData.find(v => v.id === vendedorId);
-        if (vendedor) {
-            document.getElementById('vendor-name').value = vendedor.nome;
-            document.getElementById('vendor-sales').value = vendedor.vendas;
-            document.getElementById('vendor-target').value = vendedor.meta;
-            document.getElementById('vendor-avatar').value = vendedor.avatar;
-        }
-    } else {
-        limparFormulario();
-    }
-}
-
-function limparFormulario() {
-    document.getElementById('vendor-name').value = '';
-    document.getElementById('vendor-sales').value = '';
-    document.getElementById('vendor-target').value = '';
-    document.getElementById('vendor-avatar').value = '';
-    document.getElementById('vendedor-select').value = '';
-}
-
 function renderVendedoresTable() {
     const tableContainer = document.getElementById('vendors-table');
     if (!tableContainer) return;
@@ -271,7 +229,6 @@ function renderVendedoresTable() {
                     <th>Vendas</th>
                     <th>Meta</th>
                     <th>Progress</th>
-                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -295,14 +252,6 @@ function renderVendedoresTable() {
                         <span class="progress-text">${progressPercent.toFixed(1)}%</span>
                     </div>
                 </td>
-                <td>
-                    <button onclick="editarVendedor(${vendedor.id})" class="btn btn-small btn-secondary">
-                        ✏️ Editar
-                    </button>
-                    <button onclick="excluirVendedor(${vendedor.id})" class="btn btn-small btn-danger">
-                        🗑️ Excluir
-                    </button>
-                </td>
             </tr>
         `;
     });
@@ -313,81 +262,6 @@ function renderVendedoresTable() {
     `;
     
     tableContainer.innerHTML = tableHTML;
-}
-
-function editarVendedor(id) {
-    const select = document.getElementById('vendedor-select');
-    select.value = id;
-    selectVendedor();
-    
-    // Scroll para o formulário
-    document.getElementById('vendedor-form').scrollIntoView({ behavior: 'smooth' });
-}
-
-function excluirVendedor(id) {
-    if (confirm('Tem certeza que deseja excluir este vendedor?')) {
-        vendedoresData = vendedoresData.filter(v => v.id !== id);
-        renderVendedores();
-        renderFormOptions();
-        renderVendedoresTable();
-        updateStats();
-        generateJsonForDownload();
-        
-        // Sincronizar com localStorage
-        syncWithLocalStorage();
-        
-        alert('Vendedor excluído com sucesso!');
-    }
-}
-
-function salvarVendedor() {
-    const select = document.getElementById('vendedor-select');
-    const vendedorId = parseInt(select.value);
-    
-    const nome = document.getElementById('vendor-name').value.trim();
-    const vendas = parseInt(document.getElementById('vendor-sales').value) || 0;
-    const meta = parseInt(document.getElementById('vendor-target').value) || 100;
-    const avatar = document.getElementById('vendor-avatar').value.trim().toUpperCase();
-    
-    if (!nome || !avatar) {
-        alert('Por favor, preencha nome e avatar!');
-        return;
-    }
-    
-    if (vendedorId) {
-        // Editar vendedor existente
-        const vendedor = vendedoresData.find(v => v.id === vendedorId);
-        if (vendedor) {
-            vendedor.nome = nome;
-            vendedor.vendas = vendas;
-            vendedor.meta = meta;
-            vendedor.avatar = avatar;
-        }
-    } else {
-        // Adicionar novo vendedor
-        const novoId = Math.max(...vendedoresData.map(v => v.id)) + 1;
-        vendedoresData.push({
-            id: novoId,
-            nome: nome,
-            vendas: vendas,
-            meta: meta,
-            avatar: avatar
-        });
-    }
-    
-    renderVendedores();
-    renderFormOptions();
-    renderVendedoresTable();
-    updateStats();
-    generateJsonForDownload();
-    
-    // Sincronizar com localStorage para o index.html
-    syncWithLocalStorage();
-    
-    // Limpar formulário
-    limparFormulario();
-    
-    alert('Vendedor salvo com sucesso!');
 }
 
 function updateStats() {
@@ -476,6 +350,9 @@ function downloadJson() {
 
 // Event listeners para controles
 document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar integração com Google Sheets
+    initSheetsIntegration();
+    
     // Inicializar a aplicação
     initializeApp();
     
@@ -489,11 +366,75 @@ document.addEventListener('DOMContentLoaded', function() {
     if (pauseBtn) pauseBtn.addEventListener('click', pauseRace);
     if (resetBtn) resetBtn.addEventListener('click', resetRace);
     if (updateBtn) updateBtn.addEventListener('click', loadVendedoresData);
-    
-    // Formulário de cadastro
-    const vendedorSelect = document.getElementById('vendedor-select');
-    const salvarBtn = document.getElementById('salvar-vendedor');
-    
-    if (vendedorSelect) vendedorSelect.addEventListener('change', selectVendedor);
-    if (salvarBtn) salvarBtn.addEventListener('click', salvarVendedor);
 });
+
+// Funções para integração com Google Sheets
+async function testSheetsConnection() {
+    const statusDiv = document.getElementById('sheets-status');
+    statusDiv.style.display = 'block';
+    statusDiv.style.backgroundColor = '#3b82f6';
+    statusDiv.style.color = 'white';
+    statusDiv.innerHTML = '🔄 Testando conexão...';
+    
+    try {
+        if (!sheetsIntegration) {
+            throw new Error('Integração não inicializada');
+        }
+        
+        const success = await sheetsIntegration.testConnection();
+        
+        if (success) {
+            statusDiv.style.backgroundColor = '#10b981';
+            statusDiv.innerHTML = '✅ Conexão bem-sucedida! A planilha está acessível.';
+        } else {
+            statusDiv.style.backgroundColor = '#ef4444';
+            statusDiv.innerHTML = '❌ Erro na conexão. Verifique se a planilha está pública.';
+        }
+    } catch (error) {
+        statusDiv.style.backgroundColor = '#ef4444';
+        statusDiv.innerHTML = `❌ Erro: ${error.message}`;
+    }
+    
+    // Limpar status após 5 segundos
+    setTimeout(() => {
+        statusDiv.style.display = 'none';
+    }, 5000);
+}
+
+async function loadFromSheetsManual() {
+    const statusDiv = document.getElementById('sheets-status');
+    statusDiv.style.display = 'block';
+    statusDiv.style.backgroundColor = '#3b82f6';
+    statusDiv.style.color = 'white';
+    statusDiv.innerHTML = '📊 Carregando dados da planilha...';
+    
+    try {
+        const sheetsData = await loadFromSheets();
+        
+        if (sheetsData && sheetsData.length > 0) {
+            vendedoresData = sheetsData;
+            
+            // Atualizar tudo
+            renderVendedores();
+            renderVendedoresTable();
+            updateStats();
+            
+            // Sincronizar com localStorage
+            syncWithLocalStorage();
+            
+            statusDiv.style.backgroundColor = '#10b981';
+            statusDiv.innerHTML = `✅ ${sheetsData.length} vendedores carregados da planilha!`;
+        } else {
+            statusDiv.style.backgroundColor = '#f59e0b';
+            statusDiv.innerHTML = '⚠️ Nenhum vendedor encontrado na planilha.';
+        }
+    } catch (error) {
+        statusDiv.style.backgroundColor = '#ef4444';
+        statusDiv.innerHTML = `❌ Erro ao carregar: ${error.message}`;
+    }
+    
+    // Limpar status após 5 segundos
+    setTimeout(() => {
+        statusDiv.style.display = 'none';
+    }, 5000);
+}

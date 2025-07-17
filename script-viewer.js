@@ -15,11 +15,40 @@ const avatarColors = [
     'linear-gradient(45deg, #1e3a8a, #991b1b)'
 ];
 
+// Configuração da planilha (CONFIGURE AQUI)
+const PLANILHA_CONFIG = {
+    // ID da sua planilha do Google Sheets
+    SHEET_ID: '109tr9R9fN0wLBjLYomoXdpTKzUN1C6Fjzafj5GTpRHY',
+    
+    // Se você quiser usar a API (opcional, mais robusto)
+    API_KEY: '', // CONFIGURE AQUI SE QUISER USAR API
+    
+    // Intervalo de atualização automática (em minutos)
+    AUTO_REFRESH_MINUTES: 2
+};
+
 // Inicialização
-document.addEventListener('DOMContentLoaded', function() {
-    loadVendedoresData();
-    // Recarregar dados a cada 5 segundos para capturar mudanças do localStorage
-    setInterval(loadVendedoresData, 5000);
+document.addEventListener('DOMContentLoaded', async function() {
+    // Inicializar integração com planilhas se configurada
+    if (PLANILHA_CONFIG.SHEET_ID) {
+        initSheetsIntegration(PLANILHA_CONFIG.SHEET_ID, PLANILHA_CONFIG.API_KEY);
+        console.log('🔗 Integração com Google Sheets ativada');
+        
+        // Configurar auto-atualização
+        if (PLANILHA_CONFIG.AUTO_REFRESH_MINUTES > 0) {
+            const intervalMs = PLANILHA_CONFIG.AUTO_REFRESH_MINUTES * 60 * 1000;
+            setInterval(async () => {
+                console.log('🔄 Verificando atualizações na planilha...');
+                await loadVendedoresData();
+            }, intervalMs);
+        }
+    }
+    
+    // Carregar dados iniciais
+    await loadVendedoresData();
+    
+    // Recarregar dados a cada 30 segundos para capturar mudanças do localStorage
+    setInterval(loadVendedoresData, 30000);
     
     // Escutar mudanças no localStorage de outras abas
     window.addEventListener('storage', function(e) {
@@ -47,29 +76,47 @@ function loadFromLocalStorage() {
     return false;
 }
 
-// Carregar dados do arquivo JSON
+// Função principal de carregamento de dados
 async function loadVendedoresData() {
-    try {
-        // Tentar carregar do localStorage primeiro (dados mais recentes do painel admin)
-        if (loadFromLocalStorage()) {
-            renderVendedores();
-            updateStats();
-            return;
+    // Prioridade 1: Tentar carregar da planilha
+    if (PLANILHA_CONFIG.SHEET_ID && sheetsIntegration) {
+        console.log('📊 Tentando carregar dados da planilha...');
+        try {
+            const sheetsData = await loadFromSheets();
+            if (sheetsData && sheetsData.length > 0) {
+                vendedoresData = sheetsData;
+                renderVendedores();
+                updateStats();
+                console.log('✅ Dados carregados da planilha Google Sheets');
+                return;
+            }
+        } catch (error) {
+            console.warn('⚠️ Erro ao carregar da planilha, tentando localStorage:', error);
         }
-        
-        // Se não houver dados no localStorage, carregar do JSON
+    }
+    
+    // Prioridade 2: Tentar localStorage (sincronização com painel admin)
+    if (loadFromLocalStorage()) {
+        console.log('💾 Dados carregados do localStorage');
+        renderVendedores();
+        updateStats();
+        return;
+    }
+    
+    // Prioridade 3: Tentar arquivo JSON
+    try {
         const response = await fetch('./data/vendedores.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        vendedoresData = data.vendedores;
-        
+        vendedoresData = data.vendedores || data;
         renderVendedores();
         updateStats();
+        console.log('📄 Dados carregados do arquivo JSON');
     } catch (error) {
-        console.error('Erro ao carregar dados do JSON:', error);
-        // Fallback para dados padrão em caso de erro
+        console.error('❌ Erro ao carregar JSON:', error);
+        // Prioridade 4: Dados padrão
         loadDefaultData();
     }
 }

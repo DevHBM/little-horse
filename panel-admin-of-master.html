@@ -10,7 +10,7 @@
     <div class="container">
             <header>
                 <h1>🏆 Corrida dos Vendedores 🏆</h1>
-                <p>Acompanhe o desempenho da sua equipe em tempo real!</p>
+                <p>Acompanhe o desempenho da sua equipe</p>
             </header>
 
             <!-- Sistema de Abas -->
@@ -58,63 +58,33 @@
             <!-- Aba de Cadastro -->
             <div id="register-tab" class="tab-content">
                 <div class="register-section">
-                    <h2>📝 Cadastro de Vendedores</h2>
-                    
-                    <div class="form-group">
-                        <label for="vendedor-select">Editar Vendedor Existente:</label>
-                        <select id="vendedor-select" onchange="selectVendedor()">
-                            <option value="">➕ Adicionar Novo Vendedor</option>
-                        </select>
-                    </div>
-                    
-                    <form id="vendedor-form" class="vendor-form">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="vendor-name">Nome do Vendedor:</label>
-                                <input type="text" id="vendor-name" name="name" required 
-                                       placeholder="Ex: João Silva">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="vendor-avatar">Avatar (2 letras):</label>
-                                <input type="text" id="vendor-avatar" name="avatar" 
-                                       maxlength="2" required placeholder="Ex: JS">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="vendor-sales">Vendas Atuais:</label>
-                                <input type="number" id="vendor-sales" name="sales" 
-                                       min="0" required placeholder="Ex: 85">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="vendor-target">Meta de Vendas:</label>
-                                <input type="number" id="vendor-target" name="target" 
-                                       min="1" required placeholder="Ex: 100">
-                            </div>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" id="salvar-vendedor" class="btn btn-primary" onclick="salvarVendedor()">
-                                💾 Salvar Vendedor
-                            </button>
-                            <button type="button" onclick="limparFormulario()" class="btn btn-secondary">
-                                🔄 Limpar Formulário
-                            </button>
-                            <button type="button" id="cancel-edit" class="btn btn-secondary" style="display: none;">
-                                ❌ Cancelar Edição
-                            </button>
-                        </div>
-                    </form>
+                    <h2> Dados dos Vendedores</h2>
+                   
                     
                     <div class="vendors-list">
-                        <h3>👥 Lista de Vendedores</h3>
+                        <h3>👥 Lista de Vendedores da Planilha</h3>
                         <div id="vendors-table">
                             <!-- Tabela será preenchida via JavaScript -->
                         </div>
                     </div>
                     
-                    <div class="data-management">
+                    <div class="sheets-integration">
+                        <h3>📊 Integração com Google Sheets</h3>
+                        <p>🔗 <strong>Planilha configurada:</strong> <code>109tr9R9fN0wLBjLYomoXdpTKzUN1C6Fjzafj5GTpRHY</code></p>
+                        <div class="form-actions">
+                            <button type="button" onclick="testSheetsConnection()" class="btn btn-primary">
+                                🔗 Testar Conexão com Planilha
+                            </button>
+                            <button type="button" onclick="loadFromSheetsManual()" class="btn btn-secondary">
+                                📊 Carregar Dados da Planilha
+                            </button>
+                        </div>
+                        <div id="sheets-status" style="margin-top: 10px; padding: 10px; border-radius: 5px; display: none;">
+                            <!-- Status da conexão aparecerá aqui -->
+                        </div>
+                    </div>
+                    
+                    <!--<div class="data-management">
                         <h3>📁 Gerenciamento de Dados</h3>
                         <p>💡 <strong>Para GitHub Pages:</strong> Após fazer alterações, baixe o arquivo JSON atualizado e substitua o arquivo <code>data/vendedores.json</code> no seu repositório.</p>
                         <div class="form-actions">
@@ -128,7 +98,7 @@
                                 ↩️ Restaurar dados do JSON original
                             </button>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
             </div>
 
@@ -148,6 +118,7 @@
             </div>
         </div>
 
+    <script src="script-sheets.js"></script>
     <script src="script-admin.js"></script>
 </body>
 </html>
